@@ -4,14 +4,7 @@ from bot.config import config
 class Formatter:
     @staticmethod
     def format_greeting() -> str:
-        return "<b>Welcome to PhiloChat!</b> 🏛️\n\nType /chat to begin."
-
-    @staticmethod
-    def format_help_menu() -> str:
-        help_menu = "<b>Help Menu:</b>\n\n"
-        for command, desc in config.commands:
-            help_menu += f"{desc}: {command}\n\n"
-        return help_menu
+        return "<b>Welcome to PhiloChat!</b> 🏛️\n\nType /chat to begin.\n\nDeveloper: @ErfanMoosavi84"
 
     @staticmethod
     def format_philosopher_list() -> str:
