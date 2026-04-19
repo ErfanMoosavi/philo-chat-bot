@@ -1,21 +1,21 @@
-import json
-from pathlib import Path
+from bot.config import config
 
 
 class PhiloChat:
-    def __init__(self):
-        self.philosophers = self._load_philosophers()
+    @staticmethod
+    def get_greetings() -> str:
+        return config.greetings
 
-    def get_philosophers(self) -> list[dict]:
-        return self.philosophers
+    @staticmethod
+    def get_philosophers() -> str:
+        philosophers = "Here are our dear philosophers that you can chat with!\n\n"
+        for i, philosopher in enumerate(config.philosophers):
+            philosophers += f"{i + 1}- {philosopher}\n"
+        return philosophers
 
-    def _find_philosopher(self, philosopher_id: int) -> dict:
-        for p in self.philosophers:
-            if p["id"] == philosopher_id:
-                return p
-        raise ValueError(f"Philosopher with id '{philosopher_id}' not found")
-
-    def _load_philosophers(self) -> list[dict]:
-        json_path = Path(__file__).parent.parent / "resources" / "philosophers.json"
-        with open(json_path, "r", encoding="utf-8") as f:
-            return json.load(f)
+    @staticmethod
+    def get_help_menu() -> str:
+        help_menu = ""
+        for command, desc in config.commands:
+            help_menu += f"{command}: {desc}\n"
+        return help_menu
