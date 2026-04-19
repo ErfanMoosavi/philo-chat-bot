@@ -2,12 +2,23 @@ from bot.config import config
 from bot.core.philo_chat import PhiloChat
 from bot.formatter import Formatter
 from openai import OpenAI
-from telebot import TeleBot
+from telebot import TeleBot, types
 from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 bot = TeleBot(token=config.bot_api_key, parse_mode="HTML")
 philo_chat = PhiloChat()
 openai_client = OpenAI(base_url=config.base_url, api_key=config.openai_api_key)
+
+bot.set_my_commands(
+    [
+        types.BotCommand("start", "Start the bot"),
+        types.BotCommand("help", "Get list of available commands"),
+        types.BotCommand(
+            "philosophers", "See the list of philosophers you can chat with"
+        ),
+        types.BotCommand("chat", "Begin a conversation with a philosopher"),
+    ]
+)
 
 
 @bot.message_handler(commands=["start"])
