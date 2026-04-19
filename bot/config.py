@@ -10,18 +10,13 @@ class Config(BaseSettings):
     openai_api_key: str
     llm_model: str
 
-    # Greetings
-    greetings: str = (
-        "Welcome to Philo Chat!\nCommands? Use /help and see what's possible"
-    )
-
     # Commands
     commands: list[tuple[str, str]] = [
         ("/philosophers", "Get the list of philosophers")
     ]
 
     # Philosophers
-    philosophers: list[str] = ["Nietzsche", "Schopenhauer"]
+    philosophers: list[str] = ["Nietzsche", "Schopenhauer", "Socrates", "Machiavelli"]
 
     class Config:
         env_file = ".env"
