@@ -1,7 +1,12 @@
 [project]
 name = "philo-chat-bot"
 version = "0.1.0"
-description = "Add your description here"
+authors = [{ name = "Erfan Moosavi", email = "erfanmoosavi84@gmail.com" }]
+description = "Chat with your favorite philosophers - Nietzsche, Socrates, and more!"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "openai>=2.32.0",
+    "pydantic-settings>=2.13.1",
+    "pytelegrambotapi>=4.33.0",
+]

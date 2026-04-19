@@ -1,0 +1,22 @@
+[
+    {
+        "id": 0,
+        "name": "Nietzsche"
+    },
+    {
+        "id": 1,
+        "name": "Schopenhauer"
+    },
+    {
+        "id": 2,
+        "name": "Marx"
+    },
+    {
+        "id": 3,
+        "name": "Machiavelli"
+    },
+    {
+        "id": 4,
+        "name": "Socrates"
+    }
+]
