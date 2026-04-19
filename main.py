@@ -27,11 +27,6 @@ def greet(message):
     bot.send_message(message.chat.id, Formatter.format_greeting())
 
 
-@bot.message_handler(commands=["help"])
-def help(message):
-    bot.send_message(message.chat.id, Formatter.format_help_menu())
-
-
 @bot.message_handler(commands=["philosophers"])
 def get_philosophers(message):
     bot.send_message(message.chat.id, Formatter.format_philosopher_list())
