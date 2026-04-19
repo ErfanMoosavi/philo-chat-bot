@@ -38,5 +38,14 @@ class Chat:
         response = completion.choices[0].message.content.strip()
 
         self.messages.append({"role": "assistant", "content": response})
-
         return response
+
+    def _format_response(self, response: str) -> str:
+        parts = response.split("*")
+        result = []
+        for i, part in enumerate(parts):
+            if i % 2 == 0:
+                result.append(part)
+            else:
+                result.append(f"<b>{part}</b>")
+        return "".join(result)

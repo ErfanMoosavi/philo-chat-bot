@@ -1,6 +1,5 @@
 from bot.config import config
 from bot.core.philo_chat import PhiloChat
-from bot.formatter import Formatter
 from openai import OpenAI
 from telebot import TeleBot, types
 from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
@@ -11,36 +10,31 @@ openai_client = OpenAI(base_url=config.base_url, api_key=config.openai_api_key)
 
 bot.set_my_commands(
     [
-        types.BotCommand("start", "Start the bot"),
-        types.BotCommand("help", "Get list of available commands"),
-        types.BotCommand(
-            "philosophers", "See the list of philosophers you can chat with"
-        ),
-        types.BotCommand("chat", "Begin a conversation with a philosopher"),
+        types.BotCommand("start", "Philosophize"),
+        types.BotCommand("chat", "Begin your conversation"),
     ]
 )
 
 
 @bot.message_handler(commands=["start"])
-def greet(message):
+def start(message):
     philo_chat.get_or_create_user(message.from_user.id, message.from_user.first_name)
-    bot.send_message(message.chat.id, Formatter.format_greeting())
-
-
-@bot.message_handler(commands=["philosophers"])
-def get_philosophers(message):
-    bot.send_message(message.chat.id, Formatter.format_philosopher_list())
+    greetings = "<b>🤔Who are you? Feel free to ask Nietzsche - or Schopenhauer?</b>\n\nType /chat to begin.\n\nDeveloper: @ErfanMoosavi84"
+    bot.send_message(message.chat.id, greetings)
 
 
 @bot.message_handler(commands=["chat"])
 def request_chat_selection(message):
     markup = InlineKeyboardMarkup(row_width=2)
 
+    buttons = []
     for philosopher in config.philosophers:
-        button = InlineKeyboardButton(
-            text=philosopher, callback_data=f"chat_{philosopher}"
+        buttons.append(
+            InlineKeyboardButton(text=philosopher, callback_data=f"chat_{philosopher}")
         )
-        markup.add(button)
+
+    for i in range(0, len(buttons), 2):
+        markup.add(*buttons[i : i + 2])
 
     bot.send_message(
         message.chat.id, "<b>Who would you like to speak with?</b>", reply_markup=markup
@@ -84,7 +78,7 @@ def handle_text(message):
     response = philo_chat.generate_response(
         openai_client, user_id, user.active_chat, message.text
     )
-    bot.reply_to(message, Formatter.format_ai_message(response))
+    bot.reply_to(message, response)
 
 
 if __name__ == "__main__":
