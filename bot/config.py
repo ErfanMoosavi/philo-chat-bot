@@ -5,10 +5,14 @@ class Config(BaseSettings):
     # Bot API
     bot_api_key: str
 
-    # LLM API config
+    # OpenAI
     base_url: str
     openai_api_key: str
     llm_model: str
+    temp: float = 0.3
+
+    # DB
+    sqlalchemy_url: str = "sqlite:///./data/philo_chat.db"
 
     # Commands
     commands: list[tuple[str, str]] = [

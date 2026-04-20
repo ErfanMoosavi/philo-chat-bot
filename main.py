@@ -1,7 +1,8 @@
 import logging
 
 from bot.config import config
-from bot.core.philo_chat import PhiloChat
+from bot.db import SessionLocal, init_db
+from bot.models.philo_chat import PhiloChat
 from openai import OpenAI
 from telebot import TeleBot, types
 from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
@@ -12,6 +13,8 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 
+init_db()
+
 bot = TeleBot(token=config.bot_api_key, parse_mode="HTML")
 philo_chat = PhiloChat()
 openai_client = OpenAI(base_url=config.base_url, api_key=config.openai_api_key)
@@ -20,27 +23,30 @@ bot.set_my_commands(
     [
         types.BotCommand("start", "Philosophize"),
         types.BotCommand("chat", "Begin your conversation"),
+        types.BotCommand("reset_chat", "Clear current conversation history"),
     ]
 )
 
 
 @bot.message_handler(commands=["start"])
 def start(message):
-    philo_chat.get_or_create_user(message.from_user.id, message.from_user.first_name)
-    greetings = "<b>🤔Who are you? Feel free to ask Nietzsche - or Schopenhauer?</b>\n\nType /chat to begin.\n\n🧬Developer: @ErfanMoosavi84"
-    bot.send_message(message.chat.id, greetings)
+    with SessionLocal() as session:
+        philo_chat.get_or_create_user(
+            session, message.from_user.id, message.from_user.first_name
+        )
+
+        greetings = "<b>🤔Who are you? Feel free to ask Nietzsche - or Schopenhauer?</b>\n\nType /chat to begin.\n\n🧬Developer: @ErfanMoosavi84"
+        bot.send_message(message.chat.id, greetings)
 
 
 @bot.message_handler(commands=["chat"])
 def request_chat_selection(message):
     markup = InlineKeyboardMarkup(row_width=2)
-
     buttons = []
     for philosopher in config.philosophers:
         buttons.append(
             InlineKeyboardButton(text=philosopher, callback_data=f"chat_{philosopher}")
         )
-
     for i in range(0, len(buttons), 2):
         markup.add(*buttons[i : i + 2])
 
@@ -57,7 +63,10 @@ def handle_philosopher_selection(call):
     user_id = call.from_user.id
     user_name = call.from_user.first_name
 
-    is_new_chat = philo_chat.start_or_resume_chat(user_id, user_name, philosopher)
+    with SessionLocal() as session:
+        is_new_chat = philo_chat.start_or_resume_chat(
+            session, user_id, user_name, philosopher
+        )
 
     bot.answer_callback_query(call.id)
 
@@ -75,19 +84,32 @@ def handle_philosopher_selection(call):
         )
 
 
+@bot.message_handler(commands=["reset_chat"])
+def reset_conversation(message):
+    user_id = message.from_user.id
+
+    with SessionLocal() as session:
+        result_message = philo_chat.reset_chat(session, user_id)
+        bot.reply_to(message, result_message)
+
+
 @bot.message_handler(func=lambda message: True)
 def handle_text(message):
     user_id = message.from_user.id
-    user = philo_chat._find_user(user_id)
 
-    if not user or not getattr(user, "active_chat", None):
-        bot.reply_to(message, "🧠Start a chat first using /chat")
-        return
+    with SessionLocal() as session:
+        user = philo_chat._find_user(session, user_id)
 
-    bot.send_chat_action(message.chat.id, "typing")
-    response = philo_chat.generate_response(
-        openai_client, user_id, user.active_chat, message.text
-    )
+        if not user or not user.active_chat:
+            bot.reply_to(message, "🧠Start a chat first using /chat")
+            return
+
+        bot.send_chat_action(message.chat.id, "typing")
+
+        response = philo_chat.generate_response(
+            session, openai_client, user_id, user.active_chat, message.text
+        )
+
     bot.reply_to(message, response)
 
 

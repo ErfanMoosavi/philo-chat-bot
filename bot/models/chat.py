@@ -1,16 +1,30 @@
 import logging
 
 from openai import OpenAI
+from sqlalchemy import JSON, Column, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
+from sqlalchemy.orm.attributes import flag_modified
 
 from bot.config import config
+from bot.db import Base
 
 logger = logging.getLogger(__name__)
 
 
-class Chat:
-    def __init__(self, user_name: str, philosopher: str):
+class Chat(Base):
+    __tablename__ = "chats"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    philosopher = Column(String, index=True)
+    messages = Column(JSON, default=list)
+
+    user = relationship("User", back_populates="chats")
+
+    def __init__(self, user_name: str, philosopher: str, **kwargs):
+        super().__init__(**kwargs)
         self.philosopher = philosopher
-        self.messages: list[dict[str, str]] = [
+        self.messages = [
             {
                 "role": "system",
                 "content": f"""You are {philosopher}. 
@@ -38,17 +52,21 @@ class Chat:
         ]
 
     def generate_response(self, openai_client: OpenAI, text: str) -> str:
-        logger.debug(f"User message recieved: '{text}'")
+        logger.debug(f"User message received: '{text}'")
+
         self.messages.append({"role": "user", "content": text})
+        flag_modified(self, "messages")
 
         logger.info("Running chat completion...")
         completion = openai_client.chat.completions.create(
-            model=config.llm_model, messages=self.messages, temperature=0.5
+            model=config.llm_model, messages=self.messages, temperature=config.temp
         )
         response = completion.choices[0].message.content.strip()
         logger.info("Completion was successful")
 
         self.messages.append({"role": "assistant", "content": response})
+        flag_modified(self, "messages")
+
         return self._format_response(response)
 
     def _format_response(self, response: str) -> str:
