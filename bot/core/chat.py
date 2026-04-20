@@ -43,7 +43,7 @@ class Chat:
 
         logger.info("Running chat completion...")
         completion = openai_client.chat.completions.create(
-            model=config.llm_model, messages=self.messages
+            model=config.llm_model, messages=self.messages, temperature=0.5
         )
         response = completion.choices[0].message.content.strip()
         logger.info("Completion was successful")
