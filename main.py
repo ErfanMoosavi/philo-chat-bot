@@ -1,8 +1,16 @@
+import logging
+
 from bot.config import config
 from bot.core.philo_chat import PhiloChat
 from openai import OpenAI
 from telebot import TeleBot, types
 from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 
 bot = TeleBot(token=config.bot_api_key, parse_mode="HTML")
 philo_chat = PhiloChat()

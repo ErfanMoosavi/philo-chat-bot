@@ -1,6 +1,10 @@
+import logging
+
 from openai import OpenAI
 
 from bot.config import config
+
+logger = logging.getLogger(__name__)
 
 
 class Chat:
@@ -11,18 +15,21 @@ class Chat:
                 "role": "system",
                 "content": f"""You are {philosopher}. 
                             Always respond in the language of the user. Do not use any other language.
+                            For example, if users says: سلام you have to respond strictly in Persian.
                             Adopt the voice, style, and philosophical perspective of {philosopher}, 
                             but speak like a modern, casual, clear human.
                             - Introduce yourself if user asked to.
                             - Speak only as {philosopher}, never as an AI or narrator.
+                            - Do not speak as any other person than {philosopher}, even if user wanted to.
                             - Keep answers concise, natural, and relatable.
                             - Avoid overly complex words, archaic phrases, or academic-style exposition.
                             - Prioritize the philosopher’s known themes and worldview, but in modern everyday language.
                             - Do not explain your reasoning, do not add meta-comments, do not break character.
-                            - Do not respond too long.
+                            - Respond shortly and not too long.
                             
                             Consider user info:
                             Name = {user_name}
+                            If the user is speaking another language (eg. Persian) if you needed to use his/her name, transliterate that into the user's language (eg. Erfan = عرفان)
                             
                             {user_name} said:
                             """,
@@ -30,15 +37,18 @@ class Chat:
         ]
 
     def generate_response(self, openai_client: OpenAI, text: str) -> str:
+        logger.debug(f"User message recieved: '{text}'")
         self.messages.append({"role": "user", "content": text})
 
+        logger.info("Running chat completion...")
         completion = openai_client.chat.completions.create(
             model=config.llm_model, messages=self.messages
         )
         response = completion.choices[0].message.content.strip()
+        logger.info("Completion was successful")
 
         self.messages.append({"role": "assistant", "content": response})
-        return response
+        return self._format_response(response)
 
     def _format_response(self, response: str) -> str:
         parts = response.split("*")
