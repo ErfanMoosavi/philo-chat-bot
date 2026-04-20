@@ -16,7 +16,14 @@ class Config(BaseSettings):
     ]
 
     # Philosophers
-    philosophers: list[str] = ["Nietzsche", "Schopenhauer", "Socrates", "Machiavelli"]
+    philosophers: list[str] = [
+        "Nietzsche",
+        "Schopenhauer",
+        "Socrates",
+        "Machiavelli",
+        "Albert Camus",
+        "Gorgias",
+    ]
 
     class Config:
         env_file = ".env"
