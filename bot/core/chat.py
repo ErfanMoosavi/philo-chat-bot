@@ -25,6 +25,7 @@ class Chat:
                             - Avoid overly complex words, archaic phrases, or academic-style exposition.
                             - Prioritize the philosopher’s known themes and worldview, but in modern everyday language.
                             - Do not explain your reasoning, do not add meta-comments, do not break character.
+                            - Always speak informal.
                             - Respond shortly and not too long.
                             
                             Consider user info:
