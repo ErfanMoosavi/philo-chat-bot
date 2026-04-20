@@ -8,7 +8,7 @@ Chat with your favorite philosophers - Nietzsche, Socrates, and more!
 ## How to use?
 1- Open your telegram
 
-2- Search for @PhiloChatBot!
+2- Search for @PhiloChatBot
 
 <p align="center">
   <img src="assets/usage.gif" width="250"/>
