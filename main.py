@@ -19,7 +19,7 @@ bot.set_my_commands(
 @bot.message_handler(commands=["start"])
 def start(message):
     philo_chat.get_or_create_user(message.from_user.id, message.from_user.first_name)
-    greetings = "<b>🤔Who are you? Feel free to ask Nietzsche - or Schopenhauer?</b>\n\nType /chat to begin.\n\nDeveloper: @ErfanMoosavi84"
+    greetings = "<b>🤔Who are you? Feel free to ask Nietzsche - or Schopenhauer?</b>\n\nType /chat to begin.\n\n🧬Developer: @ErfanMoosavi84"
     bot.send_message(message.chat.id, greetings)
 
 
@@ -37,7 +37,9 @@ def request_chat_selection(message):
         markup.add(*buttons[i : i + 2])
 
     bot.send_message(
-        message.chat.id, "<b>Who would you like to speak with?</b>", reply_markup=markup
+        message.chat.id,
+        "<b>🏛️Who do you want to chat with?</b>",
+        reply_markup=markup,
     )
 
 
@@ -53,13 +55,13 @@ def handle_philosopher_selection(call):
 
     if is_new_chat:
         bot.edit_message_text(
-            f"You are now chatting with <b>{philosopher}</b>!",
+            f"⚡You are now chatting with <b>{philosopher}</b>!",
             chat_id=call.message.chat.id,
             message_id=call.message.message_id,
         )
     else:
         bot.edit_message_text(
-            f"Resuming your chat with <b>{philosopher}</b>.",
+            f"⚡Resuming your chat with <b>{philosopher}</b>.",
             chat_id=call.message.chat.id,
             message_id=call.message.message_id,
         )
@@ -71,7 +73,7 @@ def handle_text(message):
     user = philo_chat._find_user(user_id)
 
     if not user or not getattr(user, "active_chat", None):
-        bot.reply_to(message, "Please start a chat first using /chat")
+        bot.reply_to(message, "🧠Start a chat first using /chat")
         return
 
     bot.send_chat_action(message.chat.id, "typing")
