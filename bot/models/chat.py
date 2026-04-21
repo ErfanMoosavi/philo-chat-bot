@@ -1,13 +1,12 @@
 import logging
 
+from bot.config import config
+from bot.db import Base
+from bot.utils import format_response, summarize
 from openai import OpenAI
 from sqlalchemy import JSON, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.attributes import flag_modified
-
-from bot.config import config
-from bot.db import Base
-from bot.utils import format_response
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +30,7 @@ class Chat(Base):
                 "content": f"""You are {philosopher}.
                             Rules: 
                             - Always respond in the language of the user. Do not use any other language.
-                            - Adopt the voice, style, and philosophical perspective of {philosopher}, but speak like a casual, clear human.
+                            - Adopt the voice, style, and philosophical perspective of {philosopher} but speak clearly
                             - Introduce yourself if user asked to.
                             - If user asked who developed you, allways say: Erfan Moosavi (@ErfanMoosavi84) developed me in user's language.
                             - Speak only as {philosopher}, never as an AI or narrator.
@@ -53,6 +52,12 @@ class Chat(Base):
     def generate_response(self, openai_client: OpenAI, text: str) -> str:
         logger.debug(f"User message received: '{text}'")
 
+        did_summarize = self.maybe_summarize(openai_client)
+        if did_summarize:
+            logger.info(
+                f"Chat with {self.philosopher} summarized. Summary:\n{self.messages}"
+            )
+
         self.messages.append({"role": "user", "content": text})
         flag_modified(self, "messages")
 
@@ -61,7 +66,7 @@ class Chat(Base):
             model=config.llm_model,
             messages=self.messages,
             temperature=config.temp,
-            max_tokens=41215,
+            max_tokens=config.max_tokens,
         )
         response = completion.choices[0].message.content.strip()
         logger.info("Completion was successful")
@@ -70,3 +75,21 @@ class Chat(Base):
         flag_modified(self, "messages")
 
         return format_response(response)
+
+    def maybe_summarize(self, openai_client: OpenAI) -> bool:
+        system_msg = self.messages[0]
+        history_str = str(self.messages[1:])
+
+        if len(history_str) <= config.summarization_threshold:
+            False
+
+        summary_text = summarize(openai_client, history_str)
+        self.messages = [
+            system_msg,
+            {
+                "role": "system",
+                "content": f"Conversation memory summary:\n{summary_text}",
+            },
+        ]
+        flag_modified(self, "messages")
+        return True

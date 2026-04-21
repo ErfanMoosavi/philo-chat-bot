@@ -6,6 +6,7 @@ class Config(BaseSettings):
     bot_api_key: str
 
     # Bot settings
+    summarization_threshold: int = 15000
     limit: int = 10
     window: int = 60
 
@@ -14,6 +15,7 @@ class Config(BaseSettings):
     openai_api_key: str
     llm_model: str
     temp: float = 0.3
+    max_tokens: int = 41215
 
     # DB
     sqlalchemy_url: str = "sqlite:///./data/philo_chat.db"
