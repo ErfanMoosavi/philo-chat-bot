@@ -1,8 +1,9 @@
 import logging
+import os
 
 from bot.config import config
 from bot.db import SessionLocal, init_db
-from bot.models.philo_chat import PhiloChat
+from bot.philo_chat import PhiloChat
 from bot.utils import rate_limit
 from openai import OpenAI
 from telebot import TeleBot, types
@@ -72,18 +73,29 @@ def handle_philosopher_selection(call):
 
     bot.answer_callback_query(call.id)
 
+    image_path = f"avatars/{philosopher.lower().replace(' ', '_')}.png"
+
     if is_new_chat:
-        bot.edit_message_text(
-            f"⚡You are now chatting with <b>{philosopher}</b>!",
-            chat_id=call.message.chat.id,
-            message_id=call.message.message_id,
-        )
+        caption = f"⚡You are now chatting with <b>{philosopher}</b>!"
     else:
-        bot.edit_message_text(
-            f"⚡Resuming your chat with <b>{philosopher}</b>.",
-            chat_id=call.message.chat.id,
-            message_id=call.message.message_id,
-        )
+        caption = f"⚡Resuming your chat with <b>{philosopher}</b>."
+
+    bot.delete_message(call.message.chat.id, call.message.message_id)
+
+    try:
+        if os.path.exists(image_path):
+            with open(image_path, "rb") as photo:
+                bot.send_photo(
+                    call.message.chat.id,
+                    photo=photo,
+                    caption=caption,
+                    parse_mode="HTML",
+                )
+        else:
+            bot.send_message(call.message.chat.id, caption, parse_mode="HTML")
+
+    except Exception:
+        bot.send_message(call.message.chat.id, caption, parse_mode="HTML")
 
 
 @bot.message_handler(commands=["reset_chat"])

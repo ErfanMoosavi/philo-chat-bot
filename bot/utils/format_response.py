@@ -1,4 +1,4 @@
-def format_response(self, response: str) -> str:
+def format_response(response: str) -> str:
     parts = response.split("*")
     result = []
     for i, part in enumerate(parts):

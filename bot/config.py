@@ -27,10 +27,8 @@ class Config(BaseSettings):
     philosophers: list[str] = [
         "Nietzsche",
         "Schopenhauer",
-        "Socrates",
         "Machiavelli",
         "Albert Camus",
-        "Gorgias",
     ]
 
     class Config:
