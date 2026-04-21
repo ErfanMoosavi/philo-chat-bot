@@ -72,7 +72,8 @@ class PhiloChat:
 
         try:
             response = user.generate_response(openai_client, philosopher, text)
-        except Exception:
+        except Exception as e:
+            logger.error(str(e))
             response = "I'm pondering on my thoughts, I'll come back soon."
 
         session.commit()
