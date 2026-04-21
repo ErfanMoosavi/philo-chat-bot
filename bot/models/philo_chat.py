@@ -23,6 +23,21 @@ class PhiloChat:
             logger.info("User already exists")
         return user
 
+    def reset_all_chats(self, session: Session, user_id: int) -> str:
+        user = self._find_user(session, user_id)
+        chats = user.chats.copy()
+
+        if not chats:
+            return "❌No conversation history found to reset."
+
+        for chat in chats:
+            user.chats.remove(chat)
+
+        user.active_chat = None
+
+        session.commit()
+        return "🧹All your conversations have been reset!"
+
     def start_or_resume_chat(
         self, session: Session, user_id: int, user_name: str, philosopher: str
     ) -> bool:

@@ -23,7 +23,8 @@ bot.set_my_commands(
     [
         types.BotCommand("start", "Philosophize"),
         types.BotCommand("chat", "Begin your conversation"),
-        types.BotCommand("reset_chat", "Clear current conversation history"),
+        types.BotCommand("reset_chat", "Clear current conversation"),
+        types.BotCommand("reset_all_chats", "Clear all your conversations"),
     ]
 )
 
@@ -85,11 +86,20 @@ def handle_philosopher_selection(call):
 
 
 @bot.message_handler(commands=["reset_chat"])
-def reset_conversation(message):
+def reset_chat(message):
     user_id = message.from_user.id
 
     with SessionLocal() as session:
         result_message = philo_chat.reset_chat(session, user_id)
+        bot.reply_to(message, result_message)
+
+
+@bot.message_handler(commands=["reset_all_chats"])
+def reset_all_chats(message):
+    user_id = message.from_user.id
+
+    with SessionLocal() as session:
+        result_message = philo_chat.reset_all_chats(session, user_id)
         bot.reply_to(message, result_message)
 
 
