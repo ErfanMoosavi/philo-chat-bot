@@ -7,6 +7,7 @@ from sqlalchemy.orm.attributes import flag_modified
 
 from bot.config import config
 from bot.db import Base
+from bot.utils import format_response
 
 logger = logging.getLogger(__name__)
 
@@ -68,14 +69,4 @@ class Chat(Base):
         self.messages.append({"role": "assistant", "content": response})
         flag_modified(self, "messages")
 
-        return self._format_response(response)
-
-    def _format_response(self, response: str) -> str:
-        parts = response.split("*")
-        result = []
-        for i, part in enumerate(parts):
-            if i % 2 == 0:
-                result.append(part)
-            else:
-                result.append(f"<b>{part}</b>")
-        return "".join(result)
+        return format_response(response)
