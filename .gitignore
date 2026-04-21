@@ -132,3 +132,4 @@ cython_debug/
 
 # Data
 /data
+/avatars
