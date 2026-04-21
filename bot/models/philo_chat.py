@@ -70,7 +70,11 @@ class PhiloChat:
         if not user:
             return "❌Session expired. Please type /start again."
 
-        response = user.generate_response(openai_client, philosopher, text)
+        try:
+            response = user.generate_response(openai_client, philosopher, text)
+        except Exception:
+            response = "I'm pondering on my thoughts, I'll come back soon."
+
         session.commit()
         return response
 
