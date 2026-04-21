@@ -5,6 +5,10 @@ class Config(BaseSettings):
     # Bot API
     bot_api_key: str
 
+    # Bot settings
+    limit: int = 10
+    window: int = 60
+
     # OpenAI
     base_url: str
     openai_api_key: str

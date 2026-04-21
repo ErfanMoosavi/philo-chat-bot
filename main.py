@@ -3,6 +3,7 @@ import logging
 from bot.config import config
 from bot.db import SessionLocal, init_db
 from bot.models.philo_chat import PhiloChat
+from bot.utils import rate_limit
 from openai import OpenAI
 from telebot import TeleBot, types
 from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
@@ -91,7 +92,8 @@ def reset_chat(message):
 
     with SessionLocal() as session:
         result_message = philo_chat.reset_chat(session, user_id)
-        bot.reply_to(message, result_message)
+
+    bot.reply_to(message, result_message)
 
 
 @bot.message_handler(commands=["reset_all_chats"])
@@ -100,10 +102,12 @@ def reset_all_chats(message):
 
     with SessionLocal() as session:
         result_message = philo_chat.reset_all_chats(session, user_id)
-        bot.reply_to(message, result_message)
+
+    bot.reply_to(message, result_message)
 
 
 @bot.message_handler(func=lambda message: True)
+@rate_limit(bot=bot, limit=config.limit, window=config.window)
 def handle_text(message):
     user_id = message.from_user.id
 
@@ -111,7 +115,7 @@ def handle_text(message):
         user = philo_chat._find_user(session, user_id)
 
         if not user or not user.active_chat:
-            bot.reply_to(message, "🧠Start a chat first using /chat")
+            bot.reply_to(message, "<b>🧠Start a chat first using /chat</b>")
             return
 
         bot.send_chat_action(message.chat.id, "typing")
