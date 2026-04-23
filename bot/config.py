@@ -20,17 +20,14 @@ class Config(BaseSettings):
     # DB
     sqlalchemy_url: str = "sqlite:///./data/philo_chat.db"
 
-    # Commands
-    commands: list[tuple[str, str]] = [
-        ("/philosophers", "Get the list of philosophers")
-    ]
-
     # Philosophers
     philosophers: list[str] = [
         "Nietzsche",
         "Schopenhauer",
         "Machiavelli",
         "Albert Camus",
+        "Socrates",
+        "Epicurus",
     ]
 
     class Config:
