@@ -24,10 +24,10 @@ class Config(BaseSettings):
     philosophers: list[str] = [
         "Nietzsche",
         "Schopenhauer",
+        "Khayyam",
         "Machiavelli",
         "Albert Camus",
         "Socrates",
-        "Epicurus",
     ]
 
     class Config:
