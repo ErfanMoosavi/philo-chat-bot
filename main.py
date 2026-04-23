@@ -73,7 +73,7 @@ def handle_philosopher_selection(call):
 
     bot.answer_callback_query(call.id)
 
-    image_path = f"avatars/{philosopher.lower().replace(' ', '_')}.png"
+    image_path = f"avatars/{philosopher.lower().replace(' ', '_')}.jpg"
 
     if is_new_chat:
         caption = f"⚡You are now chatting with <b>{philosopher}</b>!"
