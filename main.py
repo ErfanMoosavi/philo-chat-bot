@@ -28,7 +28,7 @@ async def start(message):
             session, message.from_user.id, message.from_user.first_name
         )
 
-        greetings = "<b>🤔 Who are you? Feel free to ask Nietzsche - or Schopenhauer?</b>\n\nType /chat to begin.\n\n🧬Developer: @ErfanMoosavi84"
+        greetings = "<b>🤔 Who are you? Feel free to ask Nietzsche - or Schopenhauer?</b>\n\nType /chat to begin.\n\n👨🏻‍💻 Developer: @ErfanMoosavi84"
         await bot.send_message(message.chat.id, greetings)
 
 
