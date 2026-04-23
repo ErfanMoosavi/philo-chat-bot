@@ -49,10 +49,10 @@ class Chat(Base):
             }
         ]
 
-    def generate_response(self, openai_client: OpenAI, text: str) -> str:
+    async def generate_response(self, openai_client: OpenAI, text: str) -> str:
         logger.debug(f"User message received: '{text}'")
 
-        did_summarize = self.maybe_summarize(openai_client)
+        did_summarize = await self.maybe_summarize(openai_client)
         if did_summarize:
             logger.info(
                 f"Chat with {self.philosopher} summarized. Summary:\n{self.messages}"
@@ -62,7 +62,7 @@ class Chat(Base):
         flag_modified(self, "messages")
 
         logger.info("Running chat completion...")
-        completion = openai_client.chat.completions.create(
+        completion = await openai_client.chat.completions.create(
             model=config.llm_model,
             messages=self.messages,
             temperature=config.temp,
@@ -76,14 +76,14 @@ class Chat(Base):
 
         return format_response(response)
 
-    def maybe_summarize(self, openai_client: OpenAI) -> bool:
+    async def maybe_summarize(self, openai_client: OpenAI) -> bool:
         system_msg = self.messages[0]
         history_str = " ".join([m["content"] for m in self.messages[1:]])
 
         if len(history_str) <= config.summarization_threshold:
             return False
 
-        summary_text = summarize(openai_client, history_str)
+        summary_text = await summarize(openai_client, history_str)
         self.messages = [
             system_msg,
             {

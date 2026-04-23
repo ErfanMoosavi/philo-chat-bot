@@ -1,9 +1,9 @@
-from openai import OpenAI
+from openai import AsyncOpenAI
 
 from bot.config import config
 
 
-def summarize(openai_client: OpenAI, chat_history: str) -> str:
+async def summarize(openai_client: AsyncOpenAI, chat_history: str) -> str:
     prompt = f"""
             You are a conversation summarizer. The input is a stringified list of OpenAI chat messages with role and content.
             Summarize the conversation by extracting:
@@ -24,7 +24,7 @@ def summarize(openai_client: OpenAI, chat_history: str) -> str:
             {chat_history}
             """
     messages = [{"role": "user", "content": prompt}]
-    completion = openai_client.chat.completions.create(
+    completion = await openai_client.chat.completions.create(
         model=config.llm_model, messages=messages, max_tokens=config.max_tokens
     )
     return completion.choices[0].message.content.strip()

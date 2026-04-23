@@ -1,19 +1,20 @@
 import os
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker
-
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import declarative_base
 from bot.config import config
+
 
 os.makedirs("data", exist_ok=True)
 
-
-engine = create_engine(config.sqlalchemy_url, connect_args={"check_same_thread": False})
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+engine = create_async_engine(config.sqlalchemy_url, echo=False)
+AsyncSessionLocal = async_sessionmaker(
+    bind=engine, class_=AsyncSession, expire_on_commit=False
+)
 
 Base = declarative_base()
 
 
-def init_db():
-    Base.metadata.create_all(bind=engine)
+async def init_db():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)

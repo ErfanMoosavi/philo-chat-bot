@@ -13,7 +13,9 @@ class User(Base):
     name = Column(String)
     active_chat = Column(String, nullable=True)
 
-    chats = relationship("Chat", back_populates="user", cascade="all, delete-orphan")
+    chats = relationship(
+        "Chat", back_populates="user", cascade="all, delete-orphan", lazy="selectin"
+    )
 
     def new_chat(self, philosopher: str) -> None:
         chat = self._find_chat(philosopher)
@@ -23,13 +25,13 @@ class User(Base):
         new_chat = Chat(user_name=self.name, philosopher=philosopher)
         self.chats.append(new_chat)
 
-    def generate_response(
+    async def generate_response(
         self, openai_client: OpenAI, philosopher: str, text: str
     ) -> str:
         chat = self._find_chat(philosopher)
         if not chat:
             raise ValueError("Chat session does not exist.")
-        return chat.generate_response(openai_client, text)
+        return await chat.generate_response(openai_client, text)
 
     def _find_chat(self, philosopher: str) -> Chat | None:
         for chat in self.chats:

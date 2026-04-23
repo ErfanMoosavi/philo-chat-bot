@@ -18,7 +18,7 @@ class Config(BaseSettings):
     max_tokens: int = 41215
 
     # DB
-    sqlalchemy_url: str = "sqlite:///./data/philo_chat.db"
+    sqlalchemy_url: str = "sqlite+aiosqlite:///./data/philo_chat.db"
 
     # Philosophers
     philosophers: list[str] = [
