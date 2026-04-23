@@ -6,5 +6,5 @@ services:
     env_file:
       - .env
     volumes:
-      - ./data:/bot/data
+      - ./data:/app/data
       - ./avatars:/bot/avatars

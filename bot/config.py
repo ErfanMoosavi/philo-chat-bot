@@ -6,7 +6,7 @@ class Config(BaseSettings):
     bot_api_key: str
 
     # Bot settings
-    summarization_threshold: int = 15000
+    summarization_threshold: int = 8000
     limit: int = 10
     window: int = 60
 

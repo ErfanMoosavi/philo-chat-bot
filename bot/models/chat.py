@@ -78,10 +78,10 @@ class Chat(Base):
 
     def maybe_summarize(self, openai_client: OpenAI) -> bool:
         system_msg = self.messages[0]
-        history_str = str(self.messages[1:])
+        history_str = " ".join([m["content"] for m in self.messages[1:]])
 
         if len(history_str) <= config.summarization_threshold:
-            False
+            return False
 
         summary_text = summarize(openai_client, history_str)
         self.messages = [
