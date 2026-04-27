@@ -1,10 +1,32 @@
 services:
+  db:
+    image: postgres:16
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    container_name: philo-bot-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: philo-bot
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   bot:
     build: .
+    image: philo-chat-bot
     container_name: philo-bot
     restart: unless-stopped
     env_file:
       - .env
-    volumes:
-      - ./data:/app/data
-      - ./avatars:/bot/avatars
+    depends_on:
+          db:
+            condition: service_healthy
+
+volumes:
+  postgres_data:

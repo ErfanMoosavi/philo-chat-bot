@@ -12,10 +12,10 @@ logger = logging.getLogger(__name__)
 
 
 class Chat(Base):
-    __tablename__ = "chats"
+    __tablename__ = "chat"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("user.id"))
     philosopher = Column(String, index=True)
     messages = Column(JSON, default=list)
 

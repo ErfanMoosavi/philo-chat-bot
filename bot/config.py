@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Config(BaseSettings):
@@ -18,7 +18,15 @@ class Config(BaseSettings):
     max_tokens: int = 41215
 
     # DB
-    sqlalchemy_url: str = "sqlite+aiosqlite:///./data/philo_chat.db"
+    postgres_user: str = "postgres"
+    postgres_password: str = "postgres"
+    postgres_db: str = "philo-bot"
+    postgres_host: str = "db"
+    postgres_port: int = 5432
+
+    @property
+    def sqlalchemy_url(self) -> str:
+        return f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
 
     # Philosophers
     philosophers: list[str] = [
@@ -30,10 +38,11 @@ class Config(BaseSettings):
         "Socrates",
     ]
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = False
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+    )
 
 
 config = Config()

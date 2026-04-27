@@ -1,13 +1,12 @@
+from bot.db import Base
+from bot.models.chat import Chat
 from openai import OpenAI
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
-from bot.db import Base
-from bot.models.chat import Chat
-
 
 class User(Base):
-    __tablename__ = "users"
+    __tablename__ = "user"
 
     id = Column(Integer, primary_key=True, autoincrement=False)
     name = Column(String)
