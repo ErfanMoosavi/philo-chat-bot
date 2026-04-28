@@ -2,7 +2,7 @@ import logging
 
 from bot.config import config
 from bot.db import Base
-from bot.utils import format_response, summarize
+from bot.utils import format_response
 from openai import OpenAI
 from sqlalchemy import JSON, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
@@ -18,7 +18,6 @@ class Chat(Base):
     user_id = Column(Integer, ForeignKey("user.id"))
     philosopher = Column(String, index=True)
     messages = Column(JSON, default=list)
-
     user = relationship("User", back_populates="chats")
 
     def __init__(self, user_name: str, philosopher: str, **kwargs):
@@ -36,11 +35,8 @@ class Chat(Base):
     async def generate_response(self, openai_client: OpenAI, text: str) -> str:
         logger.debug(f"User message received: '{text}'")
 
-        did_summarize = await self.maybe_summarize(openai_client)
-        if did_summarize:
-            logger.info(
-                f"Chat with {self.philosopher} summarized. Summary:\n{self.messages}"
-            )
+        if len(self.messages) > 10:
+            self.messages = [self.messages[0]]
 
         self.messages.append({"role": "user", "content": text})
         flag_modified(self, "messages")
@@ -59,21 +55,3 @@ class Chat(Base):
         flag_modified(self, "messages")
 
         return format_response(response)
-
-    async def maybe_summarize(self, openai_client: OpenAI) -> bool:
-        system_msg = self.messages[0]
-        history_str = " ".join([m["content"] for m in self.messages[1:]])
-
-        if len(history_str) <= config.summarization_threshold:
-            return False
-
-        summary_text = await summarize(openai_client, history_str)
-        self.messages = [
-            system_msg,
-            {
-                "role": "system",
-                "content": f"Conversation memory summary:\n{summary_text}",
-            },
-        ]
-        flag_modified(self, "messages")
-        return True

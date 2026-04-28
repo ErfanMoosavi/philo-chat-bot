@@ -1,12 +1,9 @@
 import json
-import os
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base
 
 from bot.config import config
-
-os.makedirs("data", exist_ok=True)
 
 engine = create_async_engine(
     config.sqlalchemy_url,

@@ -11,7 +11,6 @@ class User(Base):
     id = Column(Integer, primary_key=True, autoincrement=False)
     name = Column(String)
     active_chat = Column(String, nullable=True)
-
     chats = relationship(
         "Chat", back_populates="user", cascade="all, delete-orphan", lazy="selectin"
     )

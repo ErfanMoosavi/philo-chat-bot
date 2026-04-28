@@ -134,10 +134,10 @@ async def main() -> None:
 
     await bot.set_my_commands(
         [
-            BotCommand("start", "Philosophize"),
+            BotCommand("start", "Start the bot"),
             BotCommand("chat", "Begin your conversation"),
-            BotCommand("reset_chat", "Clear current conversation"),
-            BotCommand("reset_all_chats", "Clear all your conversations"),
+            BotCommand("reset_chat", "Clear current conversation history"),
+            BotCommand("reset_all_chats", "Clear all your conversation histories"),
         ]
     )
     await bot.polling()
